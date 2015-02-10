@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Johns Hopkins University Practical Machine Learning Project</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Johns Hopkins University Practical Machine Learning Project">
+  <meta name="author" content="Amir Abbas Darbanibasmanj">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Johns Hopkins University Practical Machine Learning Project</h1>
+    <h2></h2>
+    <p>Amir Abbas Darbanibasmanj<br/>Data_Driven Marketer and Data Mining Specialist | amirabbas.darbani@gmail.com</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Step 0 : loading the required Packages</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>library(caret)</p>
+
+<p>library(AppliedPredictiveModeling)</p>
+
+<p>library(kernlab)</p>
+
+<p>library(randomForest)</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>STEP 1 : Downloading Data: First We Download te data in the specific destination</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>setInternet2(TRUE)</p>
+
+<p>trainUrl &lt;- &quot;<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a>&quot;</p>
+
+<p>download.file(trainUrl, destfile = &quot;D:/Coursera/Practical Machin Learning/Project/Data/train.csv&quot;)</p>
+
+<p>testUrl &lt;- &quot;<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>&quot;</p>
+
+<p>download.file(testUrl, destfile = &quot;D:/Coursera/Practical Machin Learning/Project/Data/test.csv&quot;)</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>STEP 2 : Reading Data: Then we read the data from working directory (Note: I used ----&gt; na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&quot;,&quot;&quot;) In order to replace all missing values with NA)</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>traindata &lt;- read.csv(&quot;D:/Coursera/Practical Machin Learning/Project/Data/train.csv&quot;,  na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&quot;,&quot;&quot;), header= TRUE)</p>
+
+<p>testdata &lt;- read.csv(&quot;D:/Coursera/Practical Machin Learning/Project/Data/test.csv&quot;, na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&quot;,&quot;&quot;), header= TRUE)</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>STEP 3 : Cleaning Data : A Summary of the Train data shows that all variables with missing values, NA, should be removed as follow:</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>traindata &lt;- traindata[ , colSums(is.na(traindata)) == 0]</p>
+
+<p>testdata &lt;-  testdata[ , colSums(is.na(testdata)) == 0]</p>
+
+<p>nearZeroColumns &lt;- nearZeroVar(traindata, saveMetrics = TRUE)</p>
+
+<p>traindata &lt;- traindata[, nearZeroColumns$nzv==FALSE]</p>
+
+<p>traindata$X &lt;- NULL            # we do this so it does not interfer with ML Algorithms</p>
+
+<p>traindata$user_name &lt;- NULL</p>
+
+<p>traindata$cvtd_timestamp &lt;- NULL</p>
+
+<p>traindata$row.names &lt;- NULL</p>
+
+<p>traindata$new_window &lt;- NULL</p>
+
+<p>traindata$raw_timestamp_part_1 &lt;- NULL</p>
+
+<p>traindata$raw_timestamp_part_2 &lt;- NULL</p>
+
+<p>traindata$num_window &lt;- NULL</p>
+
+<p>testdata$X &lt;- NULL</p>
+
+<p>testdata$user_name &lt;- NULL</p>
+
+<p>testdata$problem_id &lt;- NULL</p>
+
+<p>testdata$cvtd_timestamp &lt;- NULL</p>
+
+<p>testdata$row.names &lt;- NULL</p>
+
+<p>testdata$new_window &lt;- NULL</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>STEP 4 : Spliting the train data set into two parts (60% and 40%)</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>trainIndex &lt;- createDataPartition(y = traindata$classe, p=0.6,list=FALSE)</p>
+
+<p>trainPartition &lt;- traindata[trainIndex,]</p>
+
+<p>testPartition &lt;- traindata[-trainIndex,]</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>STEP 5 : Creating ML models with different &#39;methods&#39;</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>set.seed(2434)</p>
+
+<p>model_nb &lt;- train(classe ~ .,  method=&quot;nb&quot;, data=trainPartition)</p>
+
+<p>model_gbm &lt;- train(classe ~ ., method = &quot;gbm&quot;, data = trainPartition)</p>
+
+<p>model_f &lt;- train(classe ~ .,  method =&quot;rf&quot;, data=trainPartition)</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-7" style="background:;">
+  <hgroup>
+    <h2>STEP 6 : Analysing the accuracy of the models</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>print(&quot;Naive Bayes&quot;)</p>
+
+<p>nb_accuracy &lt;- predict(model_nb, testPartition)</p>
+
+<p>print(confusionMatrix(nb_accuracy, testPartition$classe)) ### ---&gt; IF you run it, it will give the accuracy = 0.7375</p>
+
+<p>print(&quot;Stochastic Gradient Boosting&quot;)</p>
+
+<p>gbm_accuracy &lt;- predict(model_gbm, testPartition)</p>
+
+<p>print(confusionMatrix(gbm_accuracy, testPartition$classe)) ### ---&gt; IF you run it, it will give the accuracy = 0.961</p>
+
+<p>print(&quot;Random Forest&quot;)</p>
+
+<p>rf_accuracy &lt;- predict(model_f, testPartition)</p>
+
+<p>print(confusionMatrix(rf_accuracy, testPartition$classe))  ### ---&gt; IF you run it, it will give the accuracy = 0.9897</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-8" style="background:;">
+  <hgroup>
+    <h2>STEP 7 : Tuning and Cross Validation (CV)</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>set.seed(2345)
+fitcontrol &lt;- trainControl(method = &quot;repeatedcv&quot;, number = 10, repeats = 10)
+model_rf_CV &lt;- train(classe ~ ., method=&quot;rf&quot;,  data=trainPartition, trControl = fitcontrol)</p>
+
+<p>rf_CV_accuracy &lt;- predict(model_rf_CV, testPartition)
+print(confusionMatrix(rf_CV_accuracy, testPartition$classe)) ### ---&gt; If you run it, it will give the accuracy = 0.9895</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-9" style="background:;">
+  <hgroup>
+    <h2>STEP 8 : Predicting the 20 cases of the Test dataset</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>prediction &lt;- predict(model_rf_CV, testdata)
+print(prediction)</p>
+
+<p>Result : [1] B A B A A E D B A A B C B A E E A B B B
+Levels: A B C D E</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-10" style="background:;">
+  <hgroup>
+    <h2>For Fast Computing the following packages could be helpful:</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>library(parallel)</p>
+
+<p>library(doParallel)</p>
+
+<p>registerDoParallel(makeCluster(detectCores()))</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>Thank You For Watching my Presentation</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Amir Abbas Darbanibasmanj</p>
+
+<p>Data-Driven Marketer and Data Mining Specialist</p>
+
+<p><a href="mailto:amirabbas.darbani@gmail.com">amirabbas.darbani@gmail.com</a></p>
+
+<p>Find me on:</p>
+
+<p>Linkedin
+&amp;
+Twitter</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Step 0 : loading the required Packages'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='STEP 1 : Downloading Data: First We Download te data in the specific destination'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='STEP 2 : Reading Data: Then we read the data from working directory (Note: I used ----&gt; na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&quot;,&quot;&quot;) In order to replace all missing values with NA)'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='STEP 3 : Cleaning Data : A Summary of the Train data shows that all variables with missing values, NA, should be removed as follow:'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='STEP 4 : Spliting the train data set into two parts (60% and 40%)'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='STEP 5 : Creating ML models with different &#39;methods&#39;'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='STEP 6 : Analysing the accuracy of the models'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='STEP 7 : Tuning and Cross Validation (CV)'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='STEP 8 : Predicting the 20 cases of the Test dataset'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='For Fast Computing the following packages could be helpful:'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Thank You For Watching my Presentation'>
+         11
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
